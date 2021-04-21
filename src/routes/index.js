@@ -4,6 +4,8 @@ import Nav from '../components/Nav'
 import Home from '../views/Home'
 import PostDetail from '../views/PostDetail'
 import NewPost from '../views/NewPost'
+import EditPost from '../views/EditPost'
+import FourOFour from '../views/404'
 
 export default function Routes() {
     return(
@@ -30,8 +32,12 @@ export default function Routes() {
                 <Route path="/edit/:id">
                     <Nav />
                     <div className="container">
-                        <NewPost />
+                        <EditPost />
                     </div>
+                </Route>
+                <Route>
+                    <Nav />
+                    <FourOFour />
                 </Route>
             </Switch>
         </Router>

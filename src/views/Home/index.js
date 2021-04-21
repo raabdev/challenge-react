@@ -2,20 +2,21 @@ import { useContext, useEffect } from 'react'
 
 import PostsContext from '../../context/posts'
 import PostsList from './components/PostsList'
+import ErrorMessage from '../../components/ErrorMessage'
 
 export default function Home() {
 
-    const { posts, getPosts, isLoading } = useContext(PostsContext)
+    const { posts, getPosts, isLoading, hasError, errorMessage } = useContext(PostsContext)
 
     useEffect(() => {
         getPosts()
     }, [])
 
-    if (isLoading) return <p>Cargando resultados...</p>
+    if (isLoading) return <p>Loading...</p>
 
     return (
         <>
-            <PostsList posts={posts} />
+            {hasError ? <ErrorMessage message={errorMessage}/> : <PostsList posts={posts} />}
         </>
     )
 }

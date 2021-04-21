@@ -1,4 +1,5 @@
 import { useState, useContext, useEffect } from 'react'
+import { useParams, Link } from 'react-router-dom'
 
 import PostsContext from '../../context/posts'
 
@@ -8,14 +9,14 @@ export default function EditPost() {
 
     const { editPost, getPostDetail, postDetail } = useContext(PostsContext)
     
+    const [isEditing, setIsEditing] = useState(true)
+    
     useEffect(() => {
         getPostDetail(id)
     }, [])
 
     const [title, setTitle] = useState(postDetail.title)
     const [body, setBody] = useState(postDetail.body)
-
-    console.log(title)
     
     const handleChangeTitle = (event) => {
         setTitle(event.target.value)
@@ -25,11 +26,11 @@ export default function EditPost() {
         setBody(event.target.value)
     }
 
-    const handleSubmit = async (event) => {
+    const handleEditSubmit = async (event) => {
         event.preventDefault()
-        await newPost(title, body)
+        await editPost(id, title, body)
         resetForm()
-        alert("New post created!")
+        setIsEditing(false)
     }
 
     const resetForm = () => {
@@ -37,14 +38,28 @@ export default function EditPost() {
         setBody("")
     }
 
-    return (
-        <form onSubmit={handleSubmit} style={{marginTop: "15px"}}>
+    if (!isEditing) {
+        return(
+            <>
+                <p>The post has been edited.</p>
+                <Link to={"/"}>
+                    <button onClick={() => setIsEditing(true)} className="btn light-blue darken-4">Back</button>
+                </Link>
+            </>
+        )
+    }
+
+    return (        
+        <form onSubmit={handleEditSubmit} style={{marginTop: "15px"}}>
             <label>Title</label>
             <input placeholder="Write a title" type="text" onChange={handleChangeTitle} value={title} required />
             <label>Body</label>
             <input placeholder="Write a body" type="text" onChange={handleChangeBody} value={body} required />
-            <button className="btn light-blue darken-4" onClick={resetForm} style={{marginRight: "8px"}}>Reset</button>
+            <button className="btn green darken-4" onClick={resetForm} style={{marginRight: "8px"}}>Reset</button>
             <input type="submit" className="btn light-blue darken-4" value="Submit" style={{marginRight: "8px"}}/>
+            <Link to={"/"}>
+                <button className="btn red darken-4">Cancel</button>
+            </Link>
         </form>
     )
 }

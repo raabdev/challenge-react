@@ -7,6 +7,8 @@ export default function PostsProvider({ children }) {
     const [posts, setPosts] = useState([])
     const [postDetail, setPostDetail] = useState({})
     const [isLoading, setIsLoading] = useState(false)
+    const [hasError, setHasError] = useState(false)
+    const [errorMessage, setErrorMessage] = useState("")
 
     const getPosts = async () => {
         try{
@@ -15,6 +17,8 @@ export default function PostsProvider({ children }) {
             setPosts(postsResult)
         } catch (error) {
             setPosts([])
+            setErrorMessage("Something has happened, check your connection")
+            setHasError(true)
         } finally {
             setIsLoading(false)
         }
@@ -28,13 +32,15 @@ export default function PostsProvider({ children }) {
             setPostDetail(detail)
         } catch (error) {
             setPostDetail({})
+            setErrorMessage("Something has happened, check your connection")
+            setHasError(true)
         } finally {
             setIsLoading(false)
         }
     }
 
     const newPost = async (title, body) => {
-        console.log("se ha creado un nuevo post")
+        console.log("new post has been created")
         try{
             const postNew = await apiCall({ url: "https://jsonplaceholder.typicode.com/posts",
             method: 'POST',
@@ -43,26 +49,33 @@ export default function PostsProvider({ children }) {
                 body: body,
             }),
             headers: { 'Content-Type': 'application/json' }})
-            setPosts([...posts, postNew])
+            const newArr = [...posts,postNew]
+            setPosts(newArr)
         } catch (error) {
             console.log(error);
         }
     }
 
-    const editPost = async (title, body) => {
-        console.log("se ha creado un nuevo post")
+    const editPost = async (id, title, body) => {
         try{
-            const postNew = await apiCall({ url: "https://jsonplaceholder.typicode.com/posts",
+            const postEdited = await apiCall({ url: `https://jsonplaceholder.typicode.com/posts/${id}`,
             method: 'PUT',
             body: JSON.stringify({
                 title: title,
                 body: body,
             }),
             headers: { 'Content-Type': 'application/json' }})
-            setPosts([...posts, postNew])
+            const result = posts.filter(item => Number(item.id) !== Number(id))
+            const finalArr = [...result, postEdited]
+            setPosts(finalArr)
         } catch (error) {
             console.log(error);
         }
+    }
+
+    const deletePost = (id) => {
+        const postsArr = posts.filter(item => item.id !== id)
+        setPosts(postsArr)
     }
 
     return(
@@ -72,7 +85,11 @@ export default function PostsProvider({ children }) {
             postDetail,
             getPostDetail,
             isLoading,
-            newPost
+            newPost,
+            editPost,
+            deletePost,
+            hasError,
+            errorMessage
         }}>
             { children }
         </PostsContext.Provider>
